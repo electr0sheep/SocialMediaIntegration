@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+    body {
+      color: #222;
+      font: 13px/18px arial, sans-serif;
+      margin: 0;
+    }
+    /* Style the buttons that are used to open and close the accordion panel */
+    .accordion {
+      background-color: #eee;
+      color: #444;
+      cursor: pointer;
+      padding: 18px;
+      width: 100%;
+      text-align: left;
+      border: none;
+      outline: none;
+      transition: 0.4s;
+    }
+
+    /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+    .active, .accordion:hover {
+      background-color: #ccc;
+    }
+
+    /* Style the accordion panel. Note: hidden by default */
+    .panel {
+      padding: 0 18px;
+      background-color: white;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.2s ease-out;
+    }
+    </style>
+  </head>
+  <body>
+    <button class="accordion">My links don't show up as links in Settings>Presentation>Confirmation Message</button>
+    <div class="panel">
+      <p>The links show up as regular text in settings, but will show up as links after a user completes your form.</p>
+    </div>
+
+    <button class="accordion">Can't you just make buttons instead of these ugly links?</button>
+    <div class="panel">
+      <p>I wish I could. Google doesn't allow html in the confirmation message. If Google allows custom html at some point in the future, I will update the plugin</p>
+    </div>
+  </body>
+  <footer>
+    <script>
+    var acc = document.getElementsByClassName("accordion");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+      acc[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var panel = this.nextElementSibling;
+        if (panel.style.maxHeight){
+          panel.style.maxHeight = null;
+        } else {
+          panel.style.maxHeight = panel.scrollHeight + "px";
+        }
+      });
+    }
+    </script>
+  </footer>
+</html>

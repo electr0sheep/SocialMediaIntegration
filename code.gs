@@ -3,8 +3,9 @@ var ADDON_TITLE = 'Social Media Integration';
 function onOpen(e) {
   FormApp.getUi()
       .createAddonMenu()
-      .addItem('Toggle buttons', 'showSidebar')
+      .addItem('Configure', 'showSidebar')
       .addItem('About', 'showAbout')
+      .addItem('FAQ', 'showFAQ')
       .addToUi();
 }
 
@@ -27,10 +28,19 @@ function showAbout() {
   FormApp.getUi().showModalDialog(ui, 'About Social Media Integration');
 }
 
+function showFAQ() {
+  var ui = HtmlService.createHtmlOutputFromFile('FAQ')
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .setWidth(420)
+      .setHeight(270);
+  FormApp.getUi().showModalDialog(ui, 'Social Media Integration FAQ');
+}
+
 function saveSettings(settings) {
   PropertiesService.getDocumentProperties().setProperties(settings);
   var form = FormApp.getActiveForm();
   var newConfirmationMessage = form.getConfirmationMessage();
+  //var thisPage = encodeURIComponent(form.shortenFormUrl(form.getPublishedUrl()));
   var thisPage = encodeURIComponent(form.getPublishedUrl());
 
   // clear previous entries
