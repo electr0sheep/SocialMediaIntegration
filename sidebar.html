@@ -103,6 +103,20 @@
 
     /* Checkbox styling */
     /* Customize the label (the container) */
+    /*
+    .container {
+      display: block;
+      position: relative;
+      padding-left: 35px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      font-size: 22px;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    */
     .container {
       cursor: pointer;
       -webkit-user-select: none;
@@ -135,7 +149,7 @@
       background-color: #eee;
     }
 
-    /* For some reason, facebook's checkbox is jacked */
+    /* For some reason, facebooks checkbox is jacked */
     .fa-facebook .checkmark {
       margin-top: -2px;
     }
@@ -186,26 +200,26 @@
     <div class="sidebar branding-below">
       <form>
         <div class="block">
-          <label for="facebook" class="fa fa-facebook container">
-            <input type="checkbox" id="facebook">
+          <label for="facebookSetting" class="fa fa-facebook container">
+            <input type="checkbox" id="facebookSetting">
             <span class="checkmark"></span>
           </label>
         </div>
         <div class="block">
-          <label for="twitter" class="fa fa-twitter container">
-            <input type="checkbox" id="twitter">
+          <label for="twitterSetting" class="fa fa-twitter container">
+            <input type="checkbox" id="twitterSetting">
             <span class="checkmark"></span>
           </label>
         </div>
         <div class="block">
-          <label for="google" class="fa fa-google container">
-            <input type="checkbox" id="google">
+          <label for="googleSetting" class="fa fa-google container">
+            <input type="checkbox" id="googleSetting">
             <span class="checkmark"></span>
           </label>
         </div>
         <div class="block">
-          <label for="linkedin" class="fa fa-linkedin container">
-            <input type="checkbox" id="linkedin">
+          <label for="linkedinSetting" class="fa fa-linkedin container">
+            <input type="checkbox" id="linkedinSetting">
             <span class="checkmark"></span>
           </label>
         </div>
@@ -232,6 +246,12 @@
            .withFailureHandler(showStatus)
            .withUserObject($('#button-bar').get())
            .getSettings();
+
+        $('#save-settings').prop('disabled', true);
+        $('#facebookSetting').prop('disabled', true);
+        $('#twitterSetting').prop('disabled', true);
+        $('#googleSetting').prop('disabled', true);
+        $('#linkedinSetting').prop('disabled', true);
       });
 
       /**
@@ -240,11 +260,17 @@
        *
        * @param {Object} settings The saved settings from the client.
        */
-      function loadSettings(settings) {
-        $('#facebook').prop('checked', settings.facebook == 'true');
-        $('#twitter').prop('checked', settings.twitter == 'true');
-        $('#google').prop('checked', settings.googleSetting == 'true');
-        $('#linkedin').prop('checked', settings.linkedin == 'true');
+       function loadSettings(settings) {
+        $('#facebookSetting').prop('checked', settings.facebookSetting == 'true');
+        $('#twitterSetting').prop('checked', settings.twitterSetting == 'true');
+        $('#googleSetting').prop('checked', settings.googleSetting == 'true');
+        $('#linkedinSetting').prop('checked', settings.linkedinSetting == 'true');
+
+        $('#save-settings').prop('disabled', false);
+        $('#facebookSetting').prop('disabled', false);
+        $('#twitterSetting').prop('disabled', false);
+        $('#googleSetting').prop('disabled', false);
+        $('#linkedinSetting').prop('disabled', false);
       }
 
       /**
@@ -254,20 +280,20 @@
       function saveSettingsToServer() {
         showStatus('Saving settings...');
         this.disabled = true;
-        $('#facebook').prop('disabled', true);
-        $('#twitter').prop('disabled', true);
-        $('#google').prop('disabled', true);
-        $('#linkedin').prop('disabled', true);
+        $('#facebookSetting').prop('disabled', true);
+        $('#twitterSetting').prop('disabled', true);
+        $('#googleSetting').prop('disabled', true);
+        $('#linkedinSetting').prop('disabled', true);
         $('#status').remove();
-        var facebook = $('#facebook').is(':checked');
-        var twitter = $('#twitter').is(':checked');
-        var googleSetting = $('#google').is(':checked');
-        var linkedin = $('#linkedin').is(':checked');
+        var facebookSetting = $('#facebookSetting').is(':checked');
+        var twitterSetting = $('#twitterSetting').is(':checked');
+        var googleSetting = $('#googleSetting').is(':checked');
+        var linkedinSetting = $('#linkedinSetting').is(':checked');
         var settings = {
-          'facebook': facebook,
-          'twitter': twitter,
+          'facebookSetting': facebookSetting,
+          'twitterSetting': twitterSetting,
           'googleSetting': googleSetting,
-          'linkedin': linkedin
+          'linkedinSetting': linkedinSetting
         };
 
         // Save the settings on the server
@@ -275,15 +301,19 @@
             .withSuccessHandler(
               function(msg, element) {
                 showStatus('');
-                $('#facebook').prop('disabled', false);
-                $('#twitter').prop('disabled', false);
-                $('#google').prop('disabled', false);
-                $('#linkedin').prop('disabled', false);
+                $('#facebookSetting').prop('disabled', false);
+                $('#twitterSetting').prop('disabled', false);
+                $('#googleSetting').prop('disabled', false);
+                $('#linkedinSetting').prop('disabled', false);
                 element.disabled = false;
               })
             .withFailureHandler(
               function(msg, element) {
                 showStatus(msg);
+                $('#facebookSetting').prop('disabled', false);
+                $('#twitterSetting').prop('disabled', false);
+                $('#googleSetting').prop('disabled', false);
+                $('#linkedinSetting').prop('disabled', false);
                 element.disabled = false;
               })
             .withUserObject(this)
@@ -297,6 +327,13 @@
        * @param {Object} element The element after which to display the Status.
        */
       function showStatus(msg) {
+      /*
+         var div = $('<div>')
+             .attr('id', 'status')
+             .attr('class','error')
+             .text(msg);
+        $(element).after(div);
+      */
         $('#message')
             .text(msg);
       }

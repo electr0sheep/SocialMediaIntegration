@@ -29,8 +29,30 @@ function showAbout() {
 
 function saveSettings(settings) {
   PropertiesService.getDocumentProperties().setProperties(settings);
-  console.log("adjusting form submit");
-  adjustFormSubmitTrigger();
+  var form = FormApp.getActiveForm();
+  var newConfirmationMessage = form.getConfirmationMessage();
+  var thisPage = encodeURIComponent(form.getPublishedUrl());
+
+  // clear previous entries
+  newConfirmationMessage = newConfirmationMessage.replace(/^Facebook: .*\n?/m, '');
+  newConfirmationMessage = newConfirmationMessage.replace(/^Twitter: .*\n?/m, '');
+  newConfirmationMessage = newConfirmationMessage.replace(/^Google: .*\n?/m, '');
+  newConfirmationMessage = newConfirmationMessage.replace(/^LinkedIn: .*\n?/m, '');
+  newConfirmationMessage = newConfirmationMessage.trim();
+
+  if (settings.facebookSetting == true) {
+    newConfirmationMessage += "\n\nFacebook: https://www.facebook.com/sharer/sharer.php?u=" + thisPage + ";src=sdkpreparse";
+  }
+  if (settings.twitterSetting == true) {
+    newConfirmationMessage += "\n\nTwitter: https://twitter.com/home?status=" + thisPage;
+  }
+  if (settings.googleSetting == true) {
+    newConfirmationMessage += "\n\nGoogle: https://plus.google.com/share?url=" + thisPage;
+  }
+  if (settings.linkedinSetting == true) {
+    newConfirmationMessage += "\n\nLinkedIn: https://www.linkedin.com/shareArticle?mini=true&url=" + thisPage + "&title=&summary=&source=";
+  }
+  form.setConfirmationMessage(newConfirmationMessage);
 }
 
 function getSettings() {
@@ -53,72 +75,4 @@ function getSettings() {
     });
   }
   return settings;
-}
-
-/**
- * Adjust the onFormSubmit trigger based on user's requests.
- */
-function adjustFormSubmitTrigger() {
-  var form = FormApp.getActiveForm();
-  console.log(form.getConfirmationMessage());
-  var triggers = ScriptApp.getUserTriggers(form);
-  var settings = PropertiesService.getDocumentProperties();
-  var triggerNeeded =
-      settings.getProperty('facebook') == 'true' ||
-      settings.getProperty('twitter') == 'true' ||
-      settings.getProperty('googleSetting') == 'true' ||
-      settings.getProperty('linkedin') == 'true';
-
-  // Create a new trigger if required; delete existing trigger
-  //   if it is not needed.
-  var existingTrigger = null;
-  for (var i = 0; i < triggers.length; i++) {
-    if (triggers[i].getEventType() == ScriptApp.EventType.ON_FORM_SUBMIT) {
-      existingTrigger = triggers[i];
-      break;
-    }
-  }
-  if (triggerNeeded && !existingTrigger) {
-    var trigger = ScriptApp.newTrigger('respondToFormSubmit')
-        .forForm(form)
-        .onFormSubmit()
-        .create();
-  } else if (!triggerNeeded && existingTrigger) {
-    ScriptApp.deleteTrigger(existingTrigger);
-  }
-}
-
-function respondToFormSubmit(e) {
-  var settings = PropertiesService.getDocumentProperties();
-  var authInfo = ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL);
-
-  // Check if the actions of the trigger require authorizations that have not
-  // been supplied yet -- if so, warn the active user via email (if possible).
-  // This check is required when using triggers with add-ons to maintain
-  // functional triggers.
-  if (authInfo.getAuthorizationStatus() ==
-      ScriptApp.AuthorizationStatus.REQUIRED) {
-    // Re-authorization is required. In this case, the user needs to be alerted
-    // that they need to reauthorize; the normal trigger action is not
-    // conducted, since authorization needs to be provided first. Send at
-    // most one 'Authorization Required' email a day, to avoid spamming users
-    // of the add-on.
-    sendReauthorizationRequest();
-  } else {
-    // All required authorizations have been granted, so continue to respond to
-    // the trigger event.
-
-    // Check if the form creator needs to be notified; if so, construct and
-    // send the notification.
-    if (settings.getProperty('creatorNotify') == 'true') {
-      sendCreatorNotification();
-    }
-
-    // Check if the form respondent needs to be notified; if so, construct and
-    // send the notification. Be sure to respect the remaining email quota.
-    if (settings.getProperty('respondentNotify') == 'true' &&
-        MailApp.getRemainingDailyQuota() > 0) {
-      sendRespondentNotification(e.response);
-    }
-  }
 }
