@@ -1,0 +1,305 @@
+<!--
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <!-- The CSS package above applies Google styling to buttons and other elements. -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">
+
+    <style>
+    /* Default styles */
+    .branding-below {
+      bottom: 54px;
+      top: 0;
+    }
+
+    .branding-text {
+      left: 7px;
+      position: relative;
+      top: 3px;
+    }
+
+    .logo {
+      vertical-align: middle;
+    }
+
+    .width-100 {
+      width: 100%;
+      box-sizing: border-box;
+      -webkit-box-sizing : border-box;‌
+      -moz-box-sizing : border-box;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    #creator-options,
+    #respondent-options {
+      background-color: #eee;
+      border-color: #eee;
+      border-width: 5px;
+      border-style: solid;
+      display: none;
+    }
+
+    #creator-email,
+    #respondent-email,
+    #button-bar,
+    #submit-subject {
+      margin-bottom: 10px;
+    }
+
+    #response-step {
+      display: inline;
+    }
+
+    /* Icons */
+    .fa {
+      padding: 10px;
+      font-size: 20px;
+      width: 20px;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 20%;
+    }
+
+    .fa-facebook {
+      background: #3B5998;
+      color: white;
+    }
+
+    .fa-twitter {
+      background: #55ACEE;
+      color: white;
+    }
+
+    .fa-google {
+      background: #dd4b39;
+      color: white;
+    }
+
+    .fa-linkedin {
+      background: #007bb5;
+      color: white;
+    }
+
+    /* Checkbox styling */
+    /* Customize the label (the container) */
+    .container {
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    /* Hide the browser's default checkbox */
+    .container input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .container input:disabled {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* Create a custom checkbox */
+    .checkmark {
+      position: absolute;
+      left: 0;
+      margin-left: 60px;
+      margin-top: -22px;
+      height: 25px;
+      width: 25px;
+      background-color: #eee;
+    }
+
+    /* For some reason, facebook's checkbox is jacked */
+    .fa-facebook .checkmark {
+      margin-top: -2px;
+    }
+
+    /* On mouse-over, add a grey background color */
+    .container:hover input ~ .checkmark {
+      background-color: #ccc;
+    }
+
+    /* When the checkbox is checked, add a blue background */
+    .container input:checked ~ .checkmark {
+      background-color: #2196F3;
+    }
+
+    /* When the checkbox is checked on mouse-over, add a dark blue blackground */
+    .container:hover input:checked ~ .checkmark {
+      background-color: #0367B4;
+    }
+
+    /* Create the checkmark/indicator (hidden when not checked) */
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+    }
+
+    /* Show the checkmark when checked */
+    .container input:checked ~ .checkmark:after {
+      display: block;
+    }
+
+    /* Style the checkmark/indicator */
+    .container .checkmark:after {
+      left: 9px;
+      top: 5px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
+    }
+
+    </style>
+  </head>
+  <body>
+    <div class="sidebar branding-below">
+      <form>
+        <div class="block">
+          <label for="facebook" class="fa fa-facebook container">
+            <input type="checkbox" id="facebook">
+            <span class="checkmark"></span>
+          </label>
+        </div>
+        <div class="block">
+          <label for="twitter" class="fa fa-twitter container">
+            <input type="checkbox" id="twitter">
+            <span class="checkmark"></span>
+          </label>
+        </div>
+        <div class="block">
+          <label for="google" class="fa fa-google container">
+            <input type="checkbox" id="google">
+            <span class="checkmark"></span>
+          </label>
+        </div>
+        <div class="block">
+          <label for="linkedin" class="fa fa-linkedin container">
+            <input type="checkbox" id="linkedin">
+            <span class="checkmark"></span>
+          </label>
+        </div>
+
+        <div class="block" id="button-bar">
+          <button class="action" id="save-settings">Save</button>
+        </div>
+        <div id="message">
+        </div>
+      </form>
+    </div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
+    </script>
+    <script>
+      /**
+       * On document load, assign required handlers to each element,
+       * and attempt to load any saved settings.
+       */
+      $(function() {
+        $('#save-settings').click(saveSettingsToServer);
+        google.script.run
+           .withSuccessHandler(loadSettings)
+           .withFailureHandler(showStatus)
+           .withUserObject($('#button-bar').get())
+           .getSettings();
+      });
+
+      /**
+       * Callback function that populates the notification options using
+       * previously saved values.
+       *
+       * @param {Object} settings The saved settings from the client.
+       */
+      function loadSettings(settings) {
+        $('#facebook').prop('checked', settings.facebook == 'true');
+        $('#twitter').prop('checked', settings.twitter == 'true');
+        $('#google').prop('checked', settings.googleSetting == 'true');
+        $('#linkedin').prop('checked', settings.linkedin == 'true');
+      }
+
+      /**
+       * Collects the options specified in the add-on sidebar and sends them to
+       * be saved as Properties on the server.
+       */
+      function saveSettingsToServer() {
+        showStatus('Saving settings...');
+        this.disabled = true;
+        $('#facebook').prop('disabled', true);
+        $('#twitter').prop('disabled', true);
+        $('#google').prop('disabled', true);
+        $('#linkedin').prop('disabled', true);
+        $('#status').remove();
+        var facebook = $('#facebook').is(':checked');
+        var twitter = $('#twitter').is(':checked');
+        var googleSetting = $('#google').is(':checked');
+        var linkedin = $('#linkedin').is(':checked');
+        var settings = {
+          'facebook': facebook,
+          'twitter': twitter,
+          'googleSetting': googleSetting,
+          'linkedin': linkedin
+        };
+
+        // Save the settings on the server
+        google.script.run
+            .withSuccessHandler(
+              function(msg, element) {
+                showStatus('');
+                $('#facebook').prop('disabled', false);
+                $('#twitter').prop('disabled', false);
+                $('#google').prop('disabled', false);
+                $('#linkedin').prop('disabled', false);
+                element.disabled = false;
+              })
+            .withFailureHandler(
+              function(msg, element) {
+                showStatus(msg);
+                element.disabled = false;
+              })
+            .withUserObject(this)
+            .saveSettings(settings);
+      }
+
+      /**
+       * Inserts a div that contains an status message after a given element.
+       *
+       * @param {String} msg The status message to display.
+       * @param {Object} element The element after which to display the Status.
+       */
+      function showStatus(msg) {
+        $('#message')
+            .text(msg);
+      }
+    </script>
+  </body>
+</html>
